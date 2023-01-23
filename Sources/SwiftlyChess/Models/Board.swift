@@ -13,32 +13,34 @@ struct Board {
         case pieceExistsAtThisPosition
         case noPieceExistsAtThisPosition
         case inputOutOfBounds
+        case moveInterference
     }
     
     var xAxis = 8
     var yAxis = 8
 
     var pieces: [Piece] = []
+    
+    func king(for team: Team) -> King {
+        pieces.first(where: {
+            $0 is King && $0.team == team
+        })! as! King
+    }
 
     func piece(at space: Position) -> Piece? {
         pieces.filter { space == $0.position }.first
     }
     
     func isCheck(for team: Team) -> Bool {
-        guard let king = pieces.first(where: {
-            $0 is King && $0.team == team
-        }) else { fatalError("A kingdom without a king.") }
-        return hasPotentialAttackers(for: king)
+        var calc = CheckmateCalculator(team: team, board: self)
+        return calc.isCheck()
     }
     
-    private func hasPotentialAttackers(for piece: Piece) -> Bool {
-        let position = piece.position
-        let enemyTeam = piece.team.enemy
-        let enemies = pieces.filter { $0.team == enemyTeam }
-        return enemies
-            .reduce(false, { $0 || $1.moveIsLegal(to: position, on: self) })
+    func isCheckmate(for team: Team) -> Bool {
+        var calc = CheckmateCalculator(team: team, board: self)
+        return calc.isCheckmate()
     }
-    
+
     func permittedPositions(for piece: Piece) -> [Position] {
         var permittedPositions: [Position] = []
         for xPos in (0..<xAxis) {
@@ -66,6 +68,19 @@ struct Board {
         }
         
         pieces.removeAll { $0.position == position }
+    }
+    
+    mutating func movePiece(at position: Position, to: Position) throws {
+        guard var movePiece = piece(at: position) else {
+            throw Error.noPieceExistsAtThisPosition
+        }
+        if let occupyingPiece = piece(at: to),
+           occupyingPiece.team != movePiece.team {
+            try self.delete(at: to)
+        }
+        movePiece.position = to
+        try delete(at: position)
+        try insert(piece: movePiece)
     }
     
     static func piece(from string: String, position: Position, whiteTeam: Team = .faceYPositive) -> Piece? {

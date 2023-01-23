@@ -96,8 +96,8 @@ public enum MovementRule {
     
     private func getRange(from: Position, to: Position) -> [Position] {
         
-        var xRange = range([to.x, from.x])
-        var yRange = range([to.y, from.y])
+        var xRange = [to.x, from.x].sequentialBetweenMinMax
+        var yRange = [to.y, from.y].sequentialBetweenMinMax
         let direction = compass(from: from, to: to)
         
         switch direction {

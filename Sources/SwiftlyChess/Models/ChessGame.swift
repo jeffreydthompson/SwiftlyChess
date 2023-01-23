@@ -20,7 +20,7 @@ struct ChessGame {
     }
     
     func isCheck(for team: Team) -> Bool {
-        board.isCheck(for: team)
+        fatalError("Unimplemented")
     }
     
     func isCheckmate(for team: Team) -> Bool {

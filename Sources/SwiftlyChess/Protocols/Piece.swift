@@ -11,7 +11,7 @@ protocol Piece {
     var description: String { get }
     var rules: [MovementRule] { get }
     var team: Team { get }
-    var position: Position { get }
+    var position: Position { get set }
     func moveIsLegal(to space: Position, on board: Board) -> Bool
 }
 
