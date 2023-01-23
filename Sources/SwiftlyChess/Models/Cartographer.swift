@@ -22,6 +22,30 @@ struct Cartographer {
         }
     }
     
+    func isWithinRange(for rule: MovementRule, from: Position, to: Position) -> Bool {
+        
+        func isInRange(_ range: Int?) -> Bool {
+            guard let limit = range else { return true }
+            if abs(from.x - to.x) > limit ||
+                abs(from.y - to.y) > limit { return false }
+            return true
+        }
+        
+        let direction = compass(from: from, to: to)
+        switch rule {
+        case .diagonal(let range):
+            if !isInRange(range) { return false }
+            if !direction.isDiagonal { return false }
+            if abs(from.x - to.x) != abs(from.y - to.y) { return false }
+        case .straight(let range):
+            if !isInRange(range) { return false }
+            if direction.isDiagonal { return false }
+        default:
+            break
+        }
+        return true
+    }
+    
     func getRange(from: Position, to: Position) -> [Position] {
         
         var xRange = [to.x, from.x].sequentialBetweenMinMax
