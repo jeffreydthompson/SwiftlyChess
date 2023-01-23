@@ -22,7 +22,13 @@ let package = Package(
             name: "SwiftlyChess",
             dependencies: []),
         .testTarget(
-            name: "SwiftlyChessTests",
+            name: "BoardTests",
             dependencies: ["SwiftlyChess"]),
+        .testTarget(
+            name: "GameTests",
+            dependencies: ["SwiftlyChess"]),
+        .testTarget(
+            name: "MovementTests",
+            dependencies: ["SwiftlyChess"])
     ]
 )
