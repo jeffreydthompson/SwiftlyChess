@@ -18,3 +18,9 @@ struct Knight: Piece {
     var description: String { team == .faceYPositive ? "♞" : "♘" }
 }
 
+extension Knight: Graduateable {
+    static func graduate(pawn: Pawn) -> Knight {
+        Knight(team: pawn.team, position: pawn.position)
+    }
+}
+

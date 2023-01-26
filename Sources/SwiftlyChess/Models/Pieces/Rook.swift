@@ -18,3 +18,8 @@ struct Rook: Piece {
     var description: String { team == .faceYPositive ? "♜" : "♖" }
 }
 
+extension Rook: Graduateable {
+    static func graduate(pawn: Pawn) -> Rook {
+        Rook(team: pawn.team, position: pawn.position)
+    }
+}

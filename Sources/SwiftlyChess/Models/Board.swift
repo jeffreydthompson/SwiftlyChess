@@ -62,7 +62,7 @@ struct Board {
         pieces.append(piece)
     }
     
-    mutating func delete(at position: Position) throws {
+    mutating func remove(at position: Position) throws {
         guard self.piece(at: position) != nil else {
             throw Error.noPieceExistsAtThisPosition
         }
@@ -76,33 +76,11 @@ struct Board {
         }
         if let occupyingPiece = piece(at: to),
            occupyingPiece.team != movePiece.team {
-            try self.delete(at: to)
+            try self.remove(at: to)
         }
         movePiece.position = to
-        try delete(at: position)
+        try remove(at: position)
         try insert(piece: movePiece)
-    }
-    
-    static func piece(from string: String, position: Position, whiteTeam: Team = .faceYPositive) -> Piece? {
-        
-        let blackTeam = whiteTeam.enemy
-        
-        let lookupTable: [String: Piece] = [
-            "♚": King(team: whiteTeam, position: position),
-            "♔": King(team: blackTeam, position: position),
-            "♛": Queen(team: whiteTeam, position: position),
-            "♕": Queen(team: blackTeam, position: position),
-            "♝": Bishop(team: whiteTeam, position: position),
-            "♗": Bishop(team: blackTeam, position: position),
-            "♞": Knight(team: whiteTeam, position: position),
-            "♘": Knight(team: blackTeam, position: position),
-            "♜": Rook(team: whiteTeam, position: position),
-            "♖": Rook(team: blackTeam, position: position),
-            "♟": Pawn(team: whiteTeam, position: position),
-            "♙": Pawn(team: blackTeam, position: position)
-        ]
-        
-        return lookupTable[string]
     }
     
     static func board(from string: String) throws -> Board {
@@ -117,7 +95,7 @@ struct Board {
             for xPos in (0..<8) {
                 let str = ary[7-yPos][xPos]
                 let position = Position(x: xPos, y: yPos)
-                if let piece = Board.piece(from: str, position: position) {
+                if let piece = PieceMaker.piece(from: str, at: position) {
                     try board.insert(piece: piece)
                 }
             }

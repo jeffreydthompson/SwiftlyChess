@@ -101,7 +101,7 @@ struct CheckmateCalculator {
                 // let's make a hypothetical and see if the king is safe
                 do {
                     var newBoard = board
-                    try newBoard.delete(at: attacker.position)
+                    try newBoard.remove(at: attacker.position)
                     try newBoard.movePiece(at: canceller.position, to: attacker.position)
                     var newCalculator = CheckmateCalculator(team: team, board: newBoard)
                     if newCalculator.isCheck() {

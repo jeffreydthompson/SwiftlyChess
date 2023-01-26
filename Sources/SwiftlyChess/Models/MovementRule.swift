@@ -12,6 +12,10 @@ public enum MovementRule {
     case straight(range: Int?)
     case knight
     case pawn
+//TODO:
+    // case castleable - rook, king, if none have been moved and no blockers between.
+    // need to track unmoved state on king, rooks and maybe pawns for the heck of it.
+    // some kind of Protocol for initialPositionTrackable?? or something
     
     private var cartographer: Cartographer { Cartographer() }
     

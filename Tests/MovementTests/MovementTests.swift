@@ -27,7 +27,7 @@ final class MovementTests: XCTestCase {
     
     func testPieceStringLookup() throws {
         let pawnString = "♟"
-        let pawn = Board.piece(from: pawnString, position: Position(x: 0, y: 0))
+        let pawn = PieceMaker.piece(from: pawnString, at: Position(x: 0, y: 0))
         XCTAssertNotNil(pawn)
         
         let charAry = standardSetup.multiLineCharArray
@@ -36,14 +36,14 @@ final class MovementTests: XCTestCase {
             for xPos in (0..<8) {
                 let str = charAry[7-yPos][xPos]
                 let position = Position(x: xPos, y: yPos)
-                if let piece = Board.piece(from: str, position: position) {
+                if let piece = PieceMaker.piece(from: str, at: position) {
                     try sut.insert(piece: piece)
                 }
             }
         }
         
         XCTAssertEqual(sut, Board.standardSetup())
-        try sut.delete(at: Position(x: 0, y: 0))
+        try sut.remove(at: Position(x: 0, y: 0))
         XCTAssertNotEqual(sut, Board.standardSetup())
     }
     

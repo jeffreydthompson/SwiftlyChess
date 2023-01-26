@@ -17,3 +17,9 @@ struct Queen: Piece {
     var position: Position
     var description: String { team == .faceYPositive ? "♛" : "♕"}
 }
+
+extension Queen: Graduateable {
+    static func graduate(pawn: Pawn) -> Queen {
+        Queen(team: pawn.team, position: pawn.position)
+    }
+}
