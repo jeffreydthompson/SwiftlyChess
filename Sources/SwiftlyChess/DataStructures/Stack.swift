@@ -1,6 +1,5 @@
 //
 //  Stack.swift
-//  TestingDataStructures
 //
 //  Created by Jeffrey Thompson on 1/22/23.
 //

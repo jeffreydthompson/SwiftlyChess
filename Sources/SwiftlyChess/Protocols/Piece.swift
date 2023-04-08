@@ -1,6 +1,5 @@
 //
 //  Piece.swift
-//  TestingDataStructures
 //
 //  Created by Jeffrey Thompson on 1/16/23.
 //
@@ -8,24 +7,22 @@
 import Foundation
 
 protocol Piece {
+    var isInInitialPosition: Bool { get set }
     var description: String { get }
     var rules: [MovementRule] { get }
     var team: Team { get }
     var position: Position { get set }
-    func moveIsLegal(to space: Position, on board: Board) -> Bool
+    func moveIsLegal(to space: Position, on board: Board) throws -> Bool
 }
 
 extension Piece {
 
-    func moveIsLegal(to space: Position, on board: Board) -> Bool {
+    func moveIsLegal(to space: Position, on board: Board) throws -> Bool {
         if space == position { return false }
         if outOfBounds(space: space, on: board) { return false }
-        if !rules
+        if try !rules
             .reduce(false, {
-                if let pawn = self as? Pawn {
-                    return ($0 || $1.obeysRule(from: position, to: space, board: board, pawnInitial: pawn.isInInitialPosition, pawnTeam: self.team))
-                }
-                return $0 || $1.obeysRule(from: position, to: space, board: board)
+                return try $0 || $1.obeysRule(from: position, to: space, board: board)
             }) { return false }
         if isSameTeam(on: space, on: board) { return false }
         return true

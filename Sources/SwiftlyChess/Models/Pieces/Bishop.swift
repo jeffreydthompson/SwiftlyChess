@@ -9,13 +9,25 @@ import Foundation
 
 struct Bishop: Piece {
 
+    var isInInitialPosition: Bool
+
     var rules: [MovementRule] {
         [.diagonal(range: nil)]
     }
 
     var team: Team
-    var position: Position
+    var position: Position { didSet { isInInitialPosition = false } }
     var description: String { team == .faceYPositive ? "♝" : "♗" }
+    
+    init(team: Team, position: Position) {
+        self.team = team
+        self.position = position
+        if (position.x == 2 || position.x == 5) && (position.y == 0 || position.y == 7) {
+            self.isInInitialPosition = true
+        } else {
+            self.isInInitialPosition = false
+        }
+    }
 }
 
 extension Bishop: Graduateable {

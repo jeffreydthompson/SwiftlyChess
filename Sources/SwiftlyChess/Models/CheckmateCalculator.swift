@@ -9,45 +9,52 @@ import Foundation
 
 struct CheckmateCalculator {
     
+    enum Error: Swift.Error {
+        case noKing
+    }
+    
     private let team: Team
     private var board: Board
     private let king: King
     private lazy var potentialAttackers: [Piece] = {
         board.pieces
             .filter({ $0.team == team.enemy })
-            .filter({ $0.moveIsLegal(to: king.position, on: board) })
+            .filter({ (try? $0.moveIsLegal(to: king.position, on: board)) ?? false })
     }()
     private lazy var teamPieces: [Piece] = {
         board.pieces.filter { $0.team == team }
     }()
     
-    init(team: Team, board: Board) {
+    init(team: Team, board: Board) throws {
         self.team = team
         self.board = board
-        self.king = board.king(for: team)
+        guard let king = board.king(for: team) else {
+            throw Error.noKing
+        }
+        self.king = king
     }
     
     mutating func isCheck() -> Bool {
         !potentialAttackers.isEmpty
     }
     
-    mutating func isCheckmate() -> Bool {
+    mutating func isCheckmate() throws -> Bool {
         if !isCheck() { return false }
-        if canEscapeCheck() { return false }
-        if canNeutralizeAttackers() { return false }
-        if teamCanBlock() { return false }
+        if try canEscapeCheck() { return false }
+        if try canNeutralizeAttackers() { return false }
+        if try teamCanBlock() { return false }
         return true
     }
     
-    mutating func canEscapeCheck() -> Bool {
+    mutating func canEscapeCheck() throws -> Bool {
 
-        let escapePositions = board.permittedPositions(for: king)
+        let escapePositions = try board.permittedPositions(for: king)
         var canEscape = [Bool]()
         for position in escapePositions {
             do {
                 var newBoard = board
                 try newBoard.movePiece(at: king.position, to: position)
-                var newCalculator = CheckmateCalculator(team: team, board: newBoard)
+                var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
                 if newCalculator.isCheck() {
                     canEscape.append(false)
                 } else {
@@ -61,7 +68,7 @@ struct CheckmateCalculator {
         return canEscape.hasTrue
     }
     
-    mutating func teamCanBlock() -> Bool {
+    mutating func teamCanBlock() throws -> Bool {
         
         var potentialBlockPositions = [Bool]()
         var removeKnights = potentialAttackers
@@ -70,11 +77,11 @@ struct CheckmateCalculator {
             let range = Cartographer().getRange(from: attacker.position, to: king.position)
             for position in range {
                 for piece in teamPieces {
-                    if piece.moveIsLegal(to: position, on: board) {
+                    if try piece.moveIsLegal(to: position, on: board) {
                         do {
                             var newBoard = board
                             try newBoard.movePiece(at: piece.position, to: position)
-                            var newCalculator = CheckmateCalculator(team: team, board: newBoard)
+                            var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
                             if newCalculator.isCheck() {
                                 potentialBlockPositions.append(false)
                             } else {
@@ -91,19 +98,19 @@ struct CheckmateCalculator {
         return potentialBlockPositions.hasTrue
     }
     
-    mutating func canNeutralizeAttackers() -> Bool {
+    mutating func canNeutralizeAttackers() throws -> Bool {
 
         var attackersNeutralized = [Bool]()
         for attacker in potentialAttackers {
             // let's see if we can take them out
-            let threatCancellers = getPotentialAttackers(for: attacker)
+            let threatCancellers = try getPotentialAttackers(for: attacker)
             for canceller in threatCancellers {
                 // let's make a hypothetical and see if the king is safe
                 do {
                     var newBoard = board
                     try newBoard.remove(at: attacker.position)
                     try newBoard.movePiece(at: canceller.position, to: attacker.position)
-                    var newCalculator = CheckmateCalculator(team: team, board: newBoard)
+                    var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
                     if newCalculator.isCheck() {
                         attackersNeutralized.append(false)
                     } else {
@@ -118,9 +125,9 @@ struct CheckmateCalculator {
         return !attackersNeutralized.hasFalse
     }
     
-    private func getPotentialAttackers(for piece: Piece) -> [Piece] {
-        board.pieces
+    private func getPotentialAttackers(for piece: Piece) throws -> [Piece] {
+        try board.pieces
             .filter({ $0.team == piece.team.enemy })
-            .filter({ $0.moveIsLegal(to: piece.position, on: board) })
+            .filter({ try $0.moveIsLegal(to: piece.position, on: board) })
     }
 }

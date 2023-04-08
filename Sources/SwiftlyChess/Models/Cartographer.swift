@@ -31,12 +31,13 @@ struct Cartographer {
             return true
         }
         
-        let direction = compass(from: from, to: to)
+        guard let direction = compass(from: from, to: to) else { return false }
+        
         switch rule {
         case .diagonal(let range):
             if !isInRange(range) { return false }
             if !direction.isDiagonal { return false }
-            if abs(from.x - to.x) != abs(from.y - to.y) { return false }
+            
         case .straight(let range):
             if !isInRange(range) { return false }
             if direction.isDiagonal { return false }
@@ -61,24 +62,28 @@ struct Cartographer {
             break
         case .southEast, .northWest:
             xRange.reverse()
+        case .none:
+            break
         }
         // assemble positions
         return Array(zip(xRange, yRange))
             .map { Position(x: $0.0, y: $0.1) }
     }
     
-    func compass(from: Position, to: Position) -> Compass {
+    func compass(from: Position, to: Position) -> Compass? {
         if from.x == to.x && from.y < to.y { return .north }
         if from.x == to.x && from.y > to.y { return .south }
         
         if from.y == to.y && from.x < to.x { return .east }
         if from.y == to.y && from.x > to.x { return .west }
         
+        guard abs(from.x - to.x) == abs(from.y - to.y) else { return nil }
+        
         if from.x > to.x && from.y > to.y { return .northEast }
         if from.x < to.x && from.y < to.y { return .southWest }
         
         if from.x < to.x && from.y > to.y { return .northWest }
         if from.x > to.x && from.y < to.y { return .southEast }
-        return .southEast
+        return nil
     }
 }

@@ -22,7 +22,7 @@ final class GameTests: XCTestCase {
     
     func testRandomMove() throws {
         let initialSetup = sut.board.toString()
-        var moved = sut.moveRandom()
+        var moved = try sut.moveRandom()
         XCTAssertTrue(moved)
         let afterMoveOne = sut.board.toString()
         print(initialSetup)
@@ -30,7 +30,7 @@ final class GameTests: XCTestCase {
         print(afterMoveOne)
         XCTAssertNotEqual(initialSetup, afterMoveOne)
         sut.switchTurn()
-        moved = sut.moveRandom()
+        moved = try sut.moveRandom()
         XCTAssertTrue(moved)
         let afterMoveTwo = sut.board.toString()
         XCTAssertNotEqual(afterMoveTwo, afterMoveOne)
@@ -42,13 +42,16 @@ final class GameTests: XCTestCase {
         var previousSetup = sut.board.toString()
         print(previousSetup)
         print("~~~~~~~~")
-        while sut.moveRandom() {
+        var steps = 0
+        while try sut.moveRandom() {
             var nowSetup = sut.board.toString()
             XCTAssertNotEqual(previousSetup, nowSetup)
             sut.switchTurn()
             previousSetup = nowSetup
-            print(previousSetup) 
+            print(previousSetup)
             print("~~~~~~~~")
+            steps += 1
+            if steps > 2000 { break }
         }
         let finalSetup = sut.board.toString()
         print(finalSetup)

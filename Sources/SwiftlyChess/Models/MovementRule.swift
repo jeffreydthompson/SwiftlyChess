@@ -1,6 +1,5 @@
 //
 //  MovementRule.swift
-//  TestingDataStructures
 //
 //  Created by Jeffrey Thompson on 1/16/23.
 //
@@ -12,72 +11,201 @@ public enum MovementRule {
     case straight(range: Int?)
     case knight
     case pawn
-//TODO:
-    // case castleable - rook, king, if none have been moved and no blockers between.
-    // need to track unmoved state on king, rooks and maybe pawns for the heck of it.
-    // some kind of Protocol for initialPositionTrackable?? or something
+    case castleable
     
     private var cartographer: Cartographer { Cartographer() }
     
     func obeysRule(
         from: Position,
         to: Position,
-        board: Board,
-        pawnInitial: Bool = false,
-        pawnTeam: Team? = nil) -> Bool {
+        board: Board) throws -> Bool {
             
             if from == to { return false }
+            
             switch self {
+            case .castleable:
+                
+                // am I King or am I Rook?
+                guard from.y == to.y else { return false }
+                guard let piece = board.piece(at: from) else { return false }
+                print("CASTLING DEBUG found piece")
+                guard piece.isInInitialPosition else { return false }
+                print("CASTLING DEBUG found piece is in initial position")
+                
+                var rookXLessThanKingX: Bool = false
+                var kingToX: Int = -1
+                
+                if piece is King {
+                    print("CASTLING DEBUG found piece is king")
+                    guard (to.x == 2 || to.x == 6) else { return false }
+                    
+                    kingToX = to.x
+                    rookXLessThanKingX = to.x < from.x
+                }
+                
+                if piece is Rook {
+                    print("CASTLING DEBUG found piece is rook")
+                    
+                    if(from.x == 0) {
+                        guard to.x == 3 else { return false }
+                    }
+                    
+                    if(from.x == 7) {
+                        guard to.x == 5 else { return false }
+                    }
+                    
+                    rookXLessThanKingX = to.x > from.x
+                    kingToX = (rookXLessThanKingX) ? 2 : 6
+                }
+                
+                // Castling Rule 1. The king and the rook may not have moved from their starting squares.  checked in get function
+                guard let (king, rook) = board.castlingSet(for: piece.team, rookXisLessThanKingX: rookXLessThanKingX) else { return false }
+                print("CASTLING DEBUG found set Rule 1 - in initial position")
+                
+                // Castling Rule 2 The king cannot be in Check.
+                guard try !board.isCheck(for: piece.team) else { return false }
+                print("CASTLING DEBUG check Rule 2")
+                
+                // Castling Rule 3. All spaces between the king and rook must be empty.
+                let range = cartographer
+                    .getRange(from: king.position, to: rook.position)
+                for position in range {
+                    if board.piece(at: position) != nil {
+                        print("CASTLING DEBUG FOUND BLOCKING PIECE")
+                        return false
+                    }
+                }
+                print("CASTLING DEBUG check Rule 3. Checked range \(range)")
+                
+                // Casting Rule 4. The squares the king will pass over may not be under attack, nor can the square on which the king will land.
+                guard try proposedPathAllSquaresSafeFromCheck(
+                    from: king.position,
+                    to: Position(x: kingToX, y: to.y),
+                    board: board) else { return false }
+                
+                print("CASTLING DEBUG check Rule 4. All passed. from: \(from) to: \(to)")
+                        
             case .diagonal, .straight:
-                if !cartographer.isWithinRange(for: self, from: from, to: to) { return false }
-                return !doesExistBlockingPieces(from: from, to: to, board: board)
+                guard cartographer.isWithinRange(for: self, from: from, to: to),
+                      isFreeOfBlockingPieces(from: from, to: to, board: board) else { return false }
+                
+                
+                if let piece = board.piece(at: from),
+                   let occupyingPiece = board.piece(at: to) {
+                    
+                    if occupyingPiece.team == piece.team { return false }
+
+                    if piece is Queen {
+ 
+                    }
+                }
+                
+                
             case .knight:
                 let xDiff = abs(from.x - to.x)
                 let yDiff = abs(from.y - to.y)
-                guard xDiff == 2 || yDiff == 2 else { return false }
-                guard xDiff == 1 || yDiff == 1 else { return false }
-                if (xDiff + yDiff == 3) { return true }
+                guard xDiff == 2 || yDiff == 2,
+                      xDiff == 1 || yDiff == 1,
+                      xDiff + yDiff == 3 else { return false }
+                guard try proposedMoveSafeFromCheck(from: from, to: to, board: board) else { return false }
             case .pawn:
-                guard let team = pawnTeam else { return false }
+                guard let pawn = board.piece(at: from),
+                    pawn is Pawn else { return false }
+                let team = pawn.team
                 // pawns can never move backwards
                 if team == .faceYPositive && to.y < from.y { return false }
                 if team == .faceYNegative && to.y > from.y { return false }
                 
+                let xDiff = abs(to.x - from.x)
+                let yDiff = abs(to.y - from.y)
+                
+                guard xDiff <= 1 else { return false } // speed optimized redundant check
+                if pawn.isInInitialPosition {
+                    guard yDiff <= 2 else { return false }
+                    guard yDiff + xDiff < 3 else { return false }
+                } else {
+                    guard yDiff == 1 else { return false }
+                }
+ 
                 // attack?
                 if from.x != to.x {
                     guard abs(to.x - from.x) == 1 && abs(to.y - from.y) == 1 else { return false }
                     // nothing there, illegal move
-                    guard let piece = board.piece(at: to) else { return false }
-                    // ensure enemy piece
-                    return piece.team == team ? false : true
+                    guard let enemyPiece = board.piece(at: to),
+                          enemyPiece.team != team else { return false }
+                    // ensure move does not cause check
+                    guard try proposedMoveSafeFromCheck(from: from, to: to, board: board) else {
+                        return false
+                    }
+                    break
                 }
                 
                 // no attack
                 if let _ = board.piece(at: to) { return false }
-                if pawnInitial {
-                    if abs(to.y - from.y) > 2 { return false }
-                    return !doesExistBlockingPieces(from: from, to: to, board: board)
-                } else {
-                    if abs(to.y - from.y) == 1 { return true }
-                }
+                guard isFreeOfBlockingPieces(
+                        from: from,
+                        to: to,
+                        board: board) else { return false }
             }
-            return false
+            
+            guard try proposedMoveSafeFromCheck(from: from, to: to, board: board) else { return false }
+            return true
         }
     
-    private func doesExistBlockingPieces(
+    private func proposedPathAllSquaresSafeFromCheck(
+        from: Position,
+        to: Position,
+        board: Board) throws -> Bool {
+            try cartographer.getRange(from: from, to: to)
+                .reduce(true) { partialResult, position in
+                    try partialResult && proposedMoveSafeFromCheck(from: from, to: position, board: board)
+                }
+        }
+    
+    private func proposedMoveSafeFromCheck(
+        from: Position,
+        to: Position,
+        board: Board) throws -> Bool {
+            var newBoard = board
+            guard let piece = newBoard.piece(at: from) else { return false }
+            do {
+                try newBoard.movePiece(at: from, to: to)
+                print(newBoard.toString())
+                return try !newBoard.isCheck(for: piece.team)
+            } catch {
+                // not a valid move, therefor safe from causing check
+                return true
+            }
+        }
+    
+    /// ignores game rules allowing piece to attack or skip.  simply returns if there are no pieces in the range
+    private func isEmpty(
+        from: Position,
+        to: Position,
+        board: Board) -> Bool {
+            cartographer
+                .getRange(from: from, to: to)
+                .filter { board.piece(at: $0) != nil }
+                .isEmpty
+        }
+    
+    private func isFreeOfBlockingPieces(
         from: Position,
         to: Position,
         board: Board) -> Bool {
             
-            if from == to { return false }
+            if from == to { return true }
             switch self {
             case .knight:
-                return false
+                return true
             default:
-                return !cartographer
-                    .getRange(from: from, to: to)
-                    .filter { board.piece(at: $0) != nil }
-                    .isEmpty
+                let range = cartographer.getRange(from: from, to: to)
+                for position in range {
+                    if let _ = board.piece(at: position) {
+                        return false
+                    }
+                }
+                return true
             }
         }
 }

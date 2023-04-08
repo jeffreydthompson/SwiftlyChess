@@ -1,6 +1,5 @@
 //
 //  String+CharArray.swift
-//  TestingDataStructures
 //
 //  Created by Jeffrey Thompson on 1/20/23.
 //

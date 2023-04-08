@@ -1,6 +1,5 @@
 //
 //  ChessGame.swift
-//  TestingDataStructures
 //
 //  Created by Jeffrey Thompson on 1/22/23.
 //
@@ -23,12 +22,12 @@ struct ChessGame {
         self.playerTeam = playerTeam
     }
     
-    func isCheck(for team: Team) -> Bool {
-        board.isCheck(for: team)
+    func isCheck(for team: Team) throws -> Bool {
+        try board.isCheck(for: team)
     }
     
-    func isCheckmate(for team: Team) -> Bool {
-        board.isCheckmate(for: team)
+    func isCheckmate(for team: Team) throws -> Bool {
+        try board.isCheckmate(for: team)
     }
 
     func select(at position: Position) -> Piece? {
@@ -40,7 +39,7 @@ struct ChessGame {
     }
     
     @discardableResult
-    mutating func moveRandom() -> Bool {
+    mutating func moveRandom() throws -> Bool {
         var teamIsTurn = board.pieces.filter { $0.team == turn }
         while !teamIsTurn.isEmpty {
             let random = Int.random(in: 0..<teamIsTurn.count)
@@ -53,7 +52,7 @@ struct ChessGame {
             for x in xAxis {
                 for y in yAxis {
                     let position = Position(x: x, y: y)
-                    if player.moveIsLegal(to: position, on: board) {
+                    if try player.moveIsLegal(to: position, on: board) {
                         do {
                             try? board.remove(at: position)
                             try move(player, to: position)
