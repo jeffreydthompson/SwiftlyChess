@@ -20,11 +20,11 @@ extension Piece {
     func moveIsLegal(to space: Position, on board: Board) throws -> Bool {
         if space == position { return false }
         if outOfBounds(space: space, on: board) { return false }
+        if isSameTeam(on: space, on: board) { return false }
         if try !rules
             .reduce(false, {
                 return try $0 || $1.obeysRule(from: position, to: space, board: board)
             }) { return false }
-        if isSameTeam(on: space, on: board) { return false }
         return true
     }
 
