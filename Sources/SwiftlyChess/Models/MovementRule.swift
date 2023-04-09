@@ -65,13 +65,13 @@ public enum MovementRule {
         board: Board) throws -> Bool {
             var newBoard = board
             guard let piece = newBoard.piece(at: from) else { return false }
+
+            try? newBoard.movePiece(at: from, to: to)
+
             do {
-                try newBoard.movePiece(at: from, to: to)
-                print(newBoard.toString())
                 return try !newBoard.isCheck(for: piece.team)
             } catch {
-                // not a valid move, therefor safe from causing check
-                return true
+                throw error
             }
         }
     

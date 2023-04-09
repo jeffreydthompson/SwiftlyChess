@@ -379,8 +379,8 @@ final class MovementTests: XCTestCase {
     
     func testIsolatedQueen() throws {
         sut = try Board.board(from: leftInCheck)
-        
-        var check = try sut.isCheck(for: .faceYNegative)
+
+        let check = try sut.isCheck(for: .faceYNegative)
         XCTAssertTrue(check)
         
         let blockingQueen = sut.piece(at: Position(x: 3, y: 7))
