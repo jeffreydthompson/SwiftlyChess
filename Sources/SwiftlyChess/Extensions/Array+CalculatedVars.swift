@@ -6,6 +6,16 @@
 
 import Foundation
 
+extension Array where Element == Position {
+    
+    func removeDoubles() -> [Position] {
+        var set = Set(self)
+        let removed = Array(set)
+        return removed
+    }
+    
+}
+
 extension Array where Element == Int {
     
     var differential: Int {

@@ -27,6 +27,5 @@ struct King: Piece {
         } else {
             self.isInInitialPosition = false
         }
-        
     }
 }

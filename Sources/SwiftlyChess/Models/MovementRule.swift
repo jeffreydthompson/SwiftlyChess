@@ -36,6 +36,63 @@ public enum MovementRule {
         ]
     }
     
+    func positionsInRange(of position: Position, team: Team? = nil) -> [Position] {
+        
+        var positions = [Position]()
+        
+        func pullPositionsFrom(quadrant: (Int, Int), range: Int?) -> [Position] {
+            
+            let rangeLimit = (range ?? 7) + 1
+            return (1..<rangeLimit).compactMap({ radius in
+                let x = (radius * quadrant.0) + position.x
+                let y = (radius * quadrant.1) + position.y
+                
+                if (x > 7) || (x < 0) || (y > 7) || (y < 0) {
+                    return nil
+                }
+                
+                return Position(x: x, y: y)
+            })
+        }
+        
+        switch self {
+        case .diagonal(let range):
+            [(1, 1), (1, -1), (-1, -1), (-1, 1)].forEach { quadrant in
+                pullPositionsFrom(quadrant: quadrant, range: range)
+                    .forEach({ position in positions.append(position) })
+            }
+        case .straight(let range):
+            [(0, 1), (1, 0), (0, -1), (-1, 0)].forEach { quadrant in
+                pullPositionsFrom(quadrant: quadrant, range: range)
+                    .forEach({ position in positions.append(position) })
+            }
+        case .knight:
+            [(1, 2), (1, -2), (-1, -2), (-1, 2),
+             (2, 1), (2, -1), (-2, -1), (-2, 1)].forEach { quadrant in
+                pullPositionsFrom(quadrant: quadrant, range: 1)
+                    .forEach({ position in positions.append(position) })
+            }
+        case .pawn:
+            guard let team = team else { return positions }
+            let m = team == .faceYPositive ? 1 : -1
+            [(-1, 1 * m), (0, 1 * m),
+             (0, 2 * m), (1, 1 * m)].forEach { quadrant in
+                pullPositionsFrom(quadrant: quadrant, range: 1)
+                    .forEach({ position in positions.append(position) })
+            }
+        case .castleable:
+            //okay so this is lying.. but it obeys the intent of optimizations.
+            //return all X Row positions for a Y given position
+            (0..<8).forEach { index in
+                if index != position.x {
+                    positions.append(Position(x: index, y: position.y))
+                }
+            }
+        }
+        
+        return positions
+    }
+    
     func obeysRule(
         from: Position,
         to: Position,

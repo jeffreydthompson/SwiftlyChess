@@ -391,4 +391,111 @@ final class MovementTests: XCTestCase {
         print(blockingQueenMoves)
         XCTAssertEqual(blockingQueenMoves.count, 1)
     }
+    
+    func testKnightPositionsRange() throws {
+        sut = try Board.board(from: knightMovementRange)
+        
+        var knight = sut.piece(at: Position(x: 1, y: 0))
+        XCTAssertNotNil(knight)
+        XCTAssertTrue(knight is Knight)
+        var posRange = knight!.positionsInRange()
+        XCTAssertEqual(posRange.count, 3)
+        
+        knight = sut.piece(at: Position(x: 4, y: 4))
+        XCTAssertNotNil(knight)
+        XCTAssertTrue(knight is Knight)
+        posRange = knight!.positionsInRange()
+        XCTAssertEqual(posRange.count, 8)
+    }
+    
+    @available(macOS 13.0, *)
+    func testRookPositionsRange() throws {
+        sut = try Board.board(from: rookMovementRange)
+        
+        var rook = sut.piece(at: Position(x: 1, y: 0))
+        XCTAssertNotNil(rook)
+        XCTAssertTrue(rook is Rook)
+        var posRange = rook!.positionsInRange()
+        XCTAssertEqual(posRange.count, 14)
+        XCTAssertTrue(posRange.contains([Position(x: 1, y: 1)]))
+        
+        rook = sut.piece(at: Position(x: 4, y: 4))
+        XCTAssertNotNil(rook)
+        XCTAssertTrue(rook is Rook)
+        posRange = rook!.positionsInRange()
+        XCTAssertEqual(posRange.count, 14)
+    }
+    
+    @available(macOS 13.0, *)
+    func testBishopPositionsRange() throws {
+        sut = try Board.board(from: bishopMovementRange)
+        
+        var bishop = sut.piece(at: Position(x: 1, y: 0))
+        XCTAssertNotNil(bishop)
+        XCTAssertTrue(bishop is Bishop)
+        var posRange = bishop!.positionsInRange()
+        XCTAssertEqual(posRange.count, 7)
+        XCTAssertTrue(posRange.contains([Position(x: 2, y: 1)]))
+        
+        bishop = sut.piece(at: Position(x: 4, y: 4))
+        XCTAssertNotNil(bishop)
+        XCTAssertTrue(bishop is Bishop)
+        posRange = bishop!.positionsInRange()
+        XCTAssertEqual(posRange.count, 13)
+    }
+    
+    @available(macOS 13.0, *)
+    func testKingPositionsRange() throws {
+        sut = try Board.board(from: kingMovementRange)
+        
+        // extra + 5 for the castling
+        var king = sut.piece(at: Position(x: 1, y: 0))
+        XCTAssertNotNil(king)
+        XCTAssertTrue(king is King)
+        var posRange = king!.positionsInRange()
+        XCTAssertEqual(posRange.count, 5 + 5)
+        XCTAssertTrue(posRange.contains([Position(x: 2, y: 1)]))
+        
+        king = sut.piece(at: Position(x: 4, y: 4))
+        XCTAssertNotNil(king)
+        XCTAssertTrue(king is King)
+        posRange = king!.positionsInRange()
+        XCTAssertEqual(posRange.count, 8 + 5)
+    }
+    
+    @available(macOS 13.0, *)
+    func testQueenPositionsRange() throws {
+        sut = try Board.board(from: queenMovementRange)
+        
+        var queen = sut.piece(at: Position(x: 1, y: 0))
+        XCTAssertNotNil(queen)
+        XCTAssertTrue(queen is Queen)
+        var posRange = queen!.positionsInRange()
+        XCTAssertEqual(posRange.count, 7 + 14)
+        XCTAssertTrue(posRange.contains([Position(x: 2, y: 1)]))
+        
+        queen = sut.piece(at: Position(x: 4, y: 4))
+        XCTAssertNotNil(queen)
+        XCTAssertTrue(queen is Queen)
+        posRange = queen!.positionsInRange()
+        XCTAssertEqual(posRange.count, 13 + 14)
+    }
+    
+//    @available(macOS 13.0, *)
+//    func testPawnPositionsRange() throws {
+//        sut = try Board.board(from: pawnMovementRange)
+//
+//        var queen = sut.piece(at: Position(x: 1, y: 0))
+//        XCTAssertNotNil(queen)
+//        XCTAssertTrue(queen is Queen)
+//        var posRange = queen!.positionsInRange()
+//        XCTAssertEqual(posRange.count, 7 + 14)
+//        XCTAssertTrue(posRange.contains([Position(x: 2, y: 1)]))
+//
+//        queen = sut.piece(at: Position(x: 4, y: 4))
+//        XCTAssertNotNil(queen)
+//        XCTAssertTrue(queen is Queen)
+//        posRange = queen!.positionsInRange()
+//        XCTAssertEqual(posRange.count, 13 + 14)
+//    }
 }

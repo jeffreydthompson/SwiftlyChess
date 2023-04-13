@@ -12,10 +12,17 @@ protocol Piece {
     var rules: [MovementRule] { get }
     var team: Team { get }
     var position: Position { get set }
+    func positionsInRange() -> [Position]
     func moveIsLegal(to space: Position, on board: Board) throws -> Bool
 }
 
 extension Piece {
+    
+    func positionsInRange() -> [Position] {
+        rules.reduce([Position]()) { ps, rule in
+            ps + rule.positionsInRange(of: position, team: team)
+        }.removeDoubles()
+    }
 
     func moveIsLegal(to space: Position, on board: Board) throws -> Bool {
         if space == position { return false }

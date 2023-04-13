@@ -59,16 +59,12 @@ struct Board {
     }
 
     func permittedPositions(for piece: Piece) throws -> [Position] {
-        var permittedPositions: [Position] = []
-        for xPos in (0..<xAxis) {
-            for yPos in (0..<yAxis) {
-                let thisPosition = Position(x: xPos, y: yPos)
-                if try piece.moveIsLegal(to: thisPosition, on: self) {
-                    permittedPositions.append(thisPosition)
-                }
-            }
+        
+        return try piece
+            .positionsInRange()
+            .compactMap {
+                try piece.moveIsLegal(to: $0, on: self) ? $0 : nil
         }
-        return permittedPositions
     }
     
     mutating func insert(piece: Piece) throws {
