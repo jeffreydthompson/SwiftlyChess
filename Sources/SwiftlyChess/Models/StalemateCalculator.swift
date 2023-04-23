@@ -9,8 +9,13 @@ import Foundation
 
 struct StalemateCalculator {
     
-    func isStalemate(on board: Board, for team: Team) -> Bool {
+    static func isStalemate(on board: Board, for team: Team) -> Bool {
         let teamPieces = board.pieces.filter({ $0.team == team })
-        return false
+        for piece in teamPieces {
+            if let positions = try? board.permittedPositions(for: piece) {
+                if positions.count > 0 { return false }
+            }
+        }
+        return true
     }
 }

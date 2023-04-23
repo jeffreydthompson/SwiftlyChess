@@ -48,6 +48,10 @@ struct Board {
         }
     }
     
+    func isStalemate(for team: Team) -> Bool {
+        StalemateCalculator.isStalemate(on: self, for: team)
+    }
+    
     func isCheck(for team: Team) throws -> Bool {
         var calc = try CheckmateCalculator(team: team, board: self)
         return calc.isCheck()
@@ -83,13 +87,19 @@ struct Board {
         pieces.removeAll { $0.position == position }
     }
     
-    mutating func movePiece(at position: Position, to: Position) throws {
+    /**
+     returns score
+     */
+    @discardableResult
+    mutating func movePiece(at position: Position, to: Position) throws -> Int {
         guard var movePiece = piece(at: position) else {
             throw Error.noPieceExistsAtThisPosition
         }
         
+        var points = 0
         if let occupyingPiece = piece(at: to) {
             if occupyingPiece.team != movePiece.team {
+                points = occupyingPiece.pieceValue ?? 1000
                 try self.remove(at: to)
             } else {
                 throw Error.sameTeamPieceExistsAtThisPosition
@@ -99,6 +109,7 @@ struct Board {
         movePiece.position = to
         try remove(at: position)
         try insert(piece: movePiece)
+        return points
     }
     
     static func board(from string: String) throws -> Board {

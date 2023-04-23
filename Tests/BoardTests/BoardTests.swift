@@ -79,4 +79,10 @@ final class BoardTests: XCTestCase {
         XCTAssertFalse(try calc.canNeutralizeAttackers())
         XCTAssertTrue(try calc.teamCanBlock())
     }
+    
+    func testStalemate() throws {
+        sut = try .board(from: stalemate)
+        XCTAssertTrue(StalemateCalculator.isStalemate(on: sut, for: .faceYNegative))
+        XCTAssertFalse(StalemateCalculator.isStalemate(on: sut, for: .faceYPositive))
+    }
 }

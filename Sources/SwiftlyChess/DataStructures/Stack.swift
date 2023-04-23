@@ -24,4 +24,8 @@ struct Stack<Element> {
         collection.popLast()
     }
     
+    func suffix(maxLength: Int) -> [Element] {
+        collection.suffix(maxLength)
+    }
+    
 }

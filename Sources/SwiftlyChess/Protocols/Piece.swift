@@ -12,6 +12,7 @@ protocol Piece {
     var rules: [MovementRule] { get }
     var team: Team { get }
     var position: Position { get set }
+    var pieceValue: Int? { get }
     func positionsInRange() -> [Position]
     func moveIsLegal(to space: Position, on board: Board) throws -> Bool
 }

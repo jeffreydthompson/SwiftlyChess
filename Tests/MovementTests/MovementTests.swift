@@ -481,21 +481,21 @@ final class MovementTests: XCTestCase {
         XCTAssertEqual(posRange.count, 13 + 14)
     }
     
-//    @available(macOS 13.0, *)
-//    func testPawnPositionsRange() throws {
-//        sut = try Board.board(from: pawnMovementRange)
-//
-//        var queen = sut.piece(at: Position(x: 1, y: 0))
-//        XCTAssertNotNil(queen)
-//        XCTAssertTrue(queen is Queen)
-//        var posRange = queen!.positionsInRange()
-//        XCTAssertEqual(posRange.count, 7 + 14)
-//        XCTAssertTrue(posRange.contains([Position(x: 2, y: 1)]))
-//
-//        queen = sut.piece(at: Position(x: 4, y: 4))
-//        XCTAssertNotNil(queen)
-//        XCTAssertTrue(queen is Queen)
-//        posRange = queen!.positionsInRange()
-//        XCTAssertEqual(posRange.count, 13 + 14)
-//    }
+    @available(macOS 13.0, *)
+    func testPawnPositionsRange() throws {
+        sut = try Board.board(from: pawnMovementRange)
+
+        var pawn = sut.piece(at: Position(x: 1, y: 0))
+        XCTAssertNotNil(pawn)
+        XCTAssertTrue(pawn is Pawn)
+        var posRange = pawn!.positionsInRange()
+        XCTAssertEqual(posRange.count, 4)
+        XCTAssertTrue(posRange.contains([Position(x: 2, y: 1)]))
+
+        pawn = sut.piece(at: Position(x: 4, y: 4))
+        XCTAssertNotNil(pawn)
+        XCTAssertTrue(pawn is Pawn)
+        posRange = pawn!.positionsInRange()
+        XCTAssertEqual(posRange.count, 4)
+    }
 }

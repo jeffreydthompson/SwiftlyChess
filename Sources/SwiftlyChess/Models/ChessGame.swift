@@ -16,10 +16,18 @@ struct ChessGame {
     
     var graduationNotification = PassthroughSubject<Pawn, Never>()
     
-    var undoStack = Stack<Board>()// consider if (team: Team, board: Board) is needed to track turn at point in time
+    var gameHistory = Stack<Board>()// consider if (team: Team, board: Board) is needed to track turn at point in time
     
     init(playerTeam: Team) {
         self.playerTeam = playerTeam
+    }
+    
+    func isDraw() -> Bool {
+        gameHistory.isDraw
+    }
+    
+    func isStalemate(for team: Team) -> Bool {
+        board.isStalemate(for: team)
     }
     
     func isCheck(for team: Team) throws -> Bool {
@@ -38,6 +46,51 @@ struct ChessGame {
         turn = (turn == .faceYPositive) ? .faceYNegative : .faceYPositive
     }
     
+    mutating func move(_ selection: Piece, to position: Position) throws {
+        try board.movePiece(at: selection.position, to: position)
+        if selection is Pawn {
+            if selection.position.y == 0 || selection.position.y == 7 {
+                graduationNotification.send(selection as! Pawn)
+            }
+        }
+    }
+    
+    mutating func graduate<T: Graduateable>(_ pawn: Pawn, to piece: T.Type) throws {
+        let upgradedPiece = T.graduate(pawn: pawn)
+        try board.remove(at: pawn.position)
+        try board.insert(piece: upgradedPiece)
+    }
+    
+    // Shallow calculation moves
+    func findHighestValueAttack(for team: Team) -> (from: Position, to: Position)? {
+        
+        let thisTeam = board.pieces.filter({ $0.team == team })
+        var highScoreFrom: Position?
+        var highScoreTo: Position?
+        var highScore = 0
+        
+        for piece in thisTeam {
+            guard let positions = try? board.permittedPositions(for: piece) else { continue }
+            for position in positions {
+                var editBoard = board
+                guard let score = try? editBoard.movePiece(at: piece.position, to: position) else { continue }
+                if score > highScore {
+                    highScoreFrom = piece.position
+                    highScoreTo = position
+                    highScore = score
+                }
+            }
+        }
+        
+        if let from = highScoreFrom,
+           let to = highScoreTo {
+            return (from, to)
+        }
+        
+        return nil
+    }
+    
+    // Randomized testing
     @discardableResult
     mutating func moveRandom() throws -> Bool {
         var teamIsTurn = board.pieces.filter { $0.team == turn }
@@ -74,26 +127,10 @@ struct ChessGame {
         return false
     }
     
-    mutating func move(_ selection: Piece, to position: Position) throws {
-        try board.movePiece(at: selection.position, to: position)
-        if selection is Pawn {
-            if selection.position.y == 0 || selection.position.y == 7 {
-                graduationNotification.send(selection as! Pawn)
-            }
-        }
-    }
-    
-    mutating func graduate<T: Graduateable>(_ pawn: Pawn, to piece: T.Type) throws {
-        let upgradedPiece = T.graduate(pawn: pawn)
-        try board.remove(at: pawn.position)
-        try board.insert(piece: upgradedPiece)
-    }
-    
     mutating private func randomGraduate(_ pawn: Pawn) throws {
         if Bool.random() { try graduate(pawn, to: Queen.self); return }
         if Bool.random() { try graduate(pawn, to: Rook.self); return }
         if Bool.random() { try graduate(pawn, to: Bishop.self); return }
         try graduate(pawn, to: Knight.self)
     }
-    
 }

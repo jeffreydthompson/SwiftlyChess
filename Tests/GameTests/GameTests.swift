@@ -56,6 +56,33 @@ final class GameTests: XCTestCase {
         let finalSetup = sut.board.toString()
         print(finalSetup)
     }
+    
+    func testHighScoreAttack() throws {
+        sut.board = try .board(from: attackSetup)
+        
+        guard let positions = sut.findHighestValueAttack(for: .faceYNegative) else {
+            
+            XCTFail("No positions found")
+            return
+        }
+        
+        XCTAssertEqual(positions.from, Position(x: 3, y: 5))
+        XCTAssertEqual(positions.to, Position(x: 3, y: 2))
+    
+    }
+    
+    func testHighScoreAttackTwo() throws {
+        sut.board = try .board(from: attackSetup)
+        
+        guard let positions = sut.findHighestValueAttack(for: .faceYPositive) else {
+            
+            XCTFail("No positions found")
+            return
+        }
+        
+        XCTAssertEqual(positions.to, Position(x: 3, y: 5))
+        XCTAssertEqual(positions.from, Position(x: 3, y: 2))
+    }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.

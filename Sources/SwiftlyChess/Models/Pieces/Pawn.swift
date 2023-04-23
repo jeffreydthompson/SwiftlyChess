@@ -26,6 +26,8 @@ struct Pawn: Piece {
     var position: Position
     var description: String { team == .faceYPositive ? "♟" : "♙" }
     
+    var pieceValue: Int? { 1 }
+    
 //    var isInInitialPosition: Bool {
 //        if (team == .faceYPositive) && (position.y == 1) { return true }
 //        if (team == .faceYNegative) && (position.y == 6) { return true }
@@ -33,8 +35,7 @@ struct Pawn: Piece {
 //    }
     
     var isGraduationPosition: Bool {
-        if position.y == 0 || position.y == 7 { return true }
-        return false
+        position.y == 0 || position.y == 7
     }
   
     func graduate<T: Graduateable>(to piece: T.Type) -> T {

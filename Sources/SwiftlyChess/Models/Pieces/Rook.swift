@@ -24,6 +24,8 @@ struct Rook: Piece {
     }
     var description: String { team == .faceYPositive ? "♜" : "♖" }
     
+    var pieceValue: Int? { 5 }
+    
     init(team: Team, position: Position) {
         self.team = team
         self.position = position

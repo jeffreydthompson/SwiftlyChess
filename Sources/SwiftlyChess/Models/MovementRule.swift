@@ -123,7 +123,7 @@ public enum MovementRule {
             var newBoard = board
             guard let piece = newBoard.piece(at: from) else { return false }
 
-            try? newBoard.movePiece(at: from, to: to)
+            let _ = try? newBoard.movePiece(at: from, to: to)
 
             do {
                 return try !newBoard.isCheck(for: piece.team)
@@ -250,15 +250,12 @@ public enum MovementRule {
             // am I King or am I Rook?
             guard from.y == to.y else { return false }
             guard let piece = board.piece(at: from) else { return false }
-            print("CASTLING DEBUG found piece")
             guard piece.isInInitialPosition else { return false }
-            print("CASTLING DEBUG found piece is in initial position")
 
             var rookXLessThanKingX: Bool = false
             var kingToX: Int = -1
 
             if piece is King {
-                print("CASTLING DEBUG found piece is king")
                 guard (to.x == 2 || to.x == 6) else { return false }
 
                 kingToX = to.x
@@ -266,8 +263,6 @@ public enum MovementRule {
             }
 
             if piece is Rook {
-                print("CASTLING DEBUG found piece is rook")
-
                 if(from.x == 0) {
                     guard to.x == 3 else { return false }
                 }
@@ -282,30 +277,24 @@ public enum MovementRule {
 
             // Castling Rule 1. The king and the rook may not have moved from their starting squares.  checked in get function
             guard let (king, rook) = board.castlingSet(for: piece.team, rookXisLessThanKingX: rookXLessThanKingX) else { return false }
-            print("CASTLING DEBUG found set Rule 1 - in initial position")
 
             // Castling Rule 2 The king cannot be in Check.
             guard try !board.isCheck(for: piece.team) else { return false }
-            print("CASTLING DEBUG check Rule 2")
 
             // Castling Rule 3. All spaces between the king and rook must be empty.
             let range = cartographer
                 .getRange(from: king.position, to: rook.position)
             for position in range {
                 if board.piece(at: position) != nil {
-                    print("CASTLING DEBUG FOUND BLOCKING PIECE")
                     return false
                 }
             }
-            print("CASTLING DEBUG check Rule 3. Checked range \(range)")
 
             // Casting Rule 4. The squares the king will pass over may not be under attack, nor can the square on which the king will land.
             guard try proposedPathAllSquaresSafeFromCheck(
                 from: king.position,
                 to: Position(x: kingToX, y: to.y),
                 board: board) else { return false }
-
-            print("CASTLING DEBUG check Rule 4. All passed. from: \(from) to: \(to)")
 
             return true
         }

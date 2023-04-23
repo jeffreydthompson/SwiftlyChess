@@ -19,6 +19,8 @@ struct King: Piece {
     var position: Position { didSet { isInInitialPosition = false } }
     var description: String { team == .faceYPositive ? "♚" : "♔"}
     
+    var pieceValue: Int? { nil } // invaluable
+    
     init(team: Team, position: Position) {
         self.team = team
         self.position = position
