@@ -141,6 +141,28 @@ final class MovementTests: XCTestCase {
         XCTAssertTrue(pPositions.contains(where: { position in
             position == Position(x: 7, y: 4)
         }))
+        
+        
+    }
+    
+    func testPawnAttack() throws {
+        sut = try Board.board(from: testPawnFour)
+        
+        var testPawn = sut.piece(at: Position(x: 2, y: 1))!
+        var pPositions = try sut.permittedPositions(for: testPawn)
+        print("TESTINGDEBUG: \(pPositions)")
+        XCTAssertTrue(pPositions.contains(where: { position in
+            position == Position(x: 3, y: 2)
+        }))
+        
+        sut = try Board.board(from: testPawnFive)
+        
+        testPawn = sut.piece(at: Position(x: 2, y: 6))!
+        pPositions = try sut.permittedPositions(for: testPawn)
+        print("TESTINGDEBUG: \(pPositions)")
+        XCTAssertTrue(pPositions.contains(where: { position in
+            position == Position(x: 3, y: 5)
+        }))
     }
 
     func testKnightMovement() throws {

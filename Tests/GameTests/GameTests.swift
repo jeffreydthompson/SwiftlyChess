@@ -83,6 +83,41 @@ final class GameTests: XCTestCase {
         XCTAssertEqual(positions.to, Position(x: 3, y: 5))
         XCTAssertEqual(positions.from, Position(x: 3, y: 2))
     }
+    
+    func testShallowAttackCalc() throws {
+        sut.board = try .board(from: attackSetup)
+        
+        guard let positions = sut.shallowSearchBestAttack(for: .faceYNegative) else {
+            
+            XCTFail("No positions found")
+            return
+        }
+        
+        XCTAssertEqual(positions.from, Position(x: 3, y: 5))
+        XCTAssertEqual(positions.to, Position(x: 3, y: 2))
+    }
+    
+    func testShallowAttackCalcTwo() throws {
+        sut.board = try .board(from: attackSetup)
+        
+        let positions = sut.shallowSearchBestAttack(for: .faceYPositive)
+        XCTAssertNil(positions)
+        
+    }
+    
+    func testPawnAttack() throws {
+        sut.board = try .board(from: pawnAttackTest)
+        
+        guard let positions = sut.findHighestValueAttack(for: .faceYNegative),
+              let score = positions.score
+        else {
+            XCTFail("should be positions")
+            return
+        }
+        
+        XCTAssertEqual(score, 9)
+        
+    }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.

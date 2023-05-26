@@ -6,6 +6,28 @@
 
 import Foundation
 
+extension Array where Element: Hashable {
+    
+    func intersection(of other: Array<Element>) -> [Element] {
+        
+        var elements = [Element: Int]()
+        
+        for element in self {
+            elements[element, default: 0] += 1
+        }
+        
+        for element in other {
+            elements[element, default: 0] += 1
+        }
+        
+        var intersection = elements.compactMap({
+            $0.value > 1 ? $0.key : nil
+        })
+        
+        return intersection
+    }
+}
+
 extension Array where Element == Position {
     
     func removeDoubles() -> [Position] {

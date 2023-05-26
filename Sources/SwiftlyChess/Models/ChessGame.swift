@@ -37,7 +37,7 @@ struct ChessGame {
     func isCheckmate(for team: Team) throws -> Bool {
         try board.isCheckmate(for: team)
     }
-
+    
     func select(at position: Position) -> Piece? {
         fatalError("Unimplemented")
     }
@@ -61,25 +61,46 @@ struct ChessGame {
         try board.insert(piece: upgradedPiece)
     }
     
-    // Shallow calculation moves
-    func findHighestValueAttack(for team: Team) -> (from: Position, to: Position)? {
+    func shallowSearchBestAttack(for team: Team) -> (from: Position, to: Position)? {
         
-        let thisTeam = board.pieces.filter({ $0.team == team })
+        let teamPieces = board.pieces.filter({ $0.team == team })
+        
         var highScoreFrom: Position?
         var highScoreTo: Position?
         var highScore = 0
         
-        for piece in thisTeam {
-            guard let positions = try? board.permittedPositions(for: piece) else { continue }
+        for piece in teamPieces {
+            guard let positions = try? board.attackPositions(for: piece) else { continue }
             for position in positions {
+                print("TESTINGDEBUG piece: \(piece.description) is trying from position: \(piece.position) to: \(position)")
                 var editBoard = board
+                
                 guard let score = try? editBoard.movePiece(at: piece.position, to: position) else { continue }
-                if score > highScore {
+                
+                guard let check = try? editBoard.isCheck(for: team),
+                      check == false else {
+                    continue
+                }
+                
+                editBoard.debugPrint()
+                
+                let counterAttack = findHighestValueAttack(for: team.enemy, on: editBoard)
+                let counterScore = counterAttack?.score ?? 0
+                
+                print("TESTINGDEBUG.  attack score: \(score) counter attack score: \(counterScore)")
+                
+                let calculatedScore = score - counterScore
+                
+                if calculatedScore > highScore {
                     highScoreFrom = piece.position
                     highScoreTo = position
-                    highScore = score
+                    highScore = calculatedScore
                 }
             }
+        }
+        
+        if highScore < 0 {
+            return nil
         }
         
         if let from = highScoreFrom,
@@ -88,6 +109,70 @@ struct ChessGame {
         }
         
         return nil
+    }
+    
+    // Shallow calculation moves
+    func findHighestValueAttack(
+        for team: Team,
+        on altBoard: Board? = nil) -> (from: Position, to: Position, score: Int?)? {
+            
+            let thisBoard = altBoard ?? board
+            
+            let teamPieces = thisBoard.pieces.filter({ $0.team == team })
+            var highScoreFrom: Position?
+            var highScoreTo: Position?
+            var highScore = 0
+            
+            for piece in teamPieces {
+                print("TESTINGDEBUG: counter attack \(piece.description) at \(piece.position)")
+                guard let positions = try? thisBoard.attackPositions(for: piece) else { continue }
+                for position in positions {
+                    print("TESTINGDEBUG: counter attack \(piece.description) at \(piece.position) to \(position)")
+                    var editBoard = thisBoard
+                    guard let score = try? editBoard.movePiece(at: piece.position, to: position) else { continue }
+                    if score > highScore {
+                        highScoreFrom = piece.position
+                        highScoreTo = position
+                        highScore = score
+                    }
+                }
+            }
+            
+            if let from = highScoreFrom,
+               let to = highScoreTo {
+                return (from, to, highScore)
+            }
+            
+            return nil
+        }
+    
+    mutating func safeRandom() throws {
+        
+        var teamPieces = board.pieces.filter { $0.team == turn }
+        
+        while !teamPieces.isEmpty {
+            let random = Int.random(in: 0..<teamPieces.count)
+            let player = teamPieces.remove(at: random)
+            var possiblePositions = player.positionsInRange()
+            
+            possiblePositions.shuffle()
+            
+            for position in possiblePositions {
+                var editBoard = board
+                
+                try? editBoard.remove(at: position)
+                try editBoard.movePiece(at: player.position, to: position)
+                
+                let counterAttack = findHighestValueAttack(for: turn.enemy, on: editBoard)
+                let counterScore = counterAttack?.score ?? 0
+                
+                if counterScore == 0 {
+                    try? board.remove(at: position)
+                    try board.movePiece(at: player.position, to: position)
+                    return
+                }
+            }
+        }
     }
     
     // Randomized testing

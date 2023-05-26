@@ -32,6 +32,10 @@ struct Board {
         pieces.filter { space == $0.position }.first
     }
     
+    func teamPieces(for team: Team) -> [Piece] {
+        pieces.filter { $0.team == team }
+    }
+    
     // FIXME: - argument name/type
     func castlingSet(for team: Team, rookXisLessThanKingX: Bool) -> (king: King, rook: Rook)? {
         
@@ -60,6 +64,23 @@ struct Board {
     func isCheckmate(for team: Team) throws -> Bool {
         var calc = try CheckmateCalculator(team: team, board: self)
         return try calc.isCheckmate()
+    }
+    
+    func attackPositions(for piece: Piece) throws -> [Position] {
+        
+        var attackPositions = [Position]()
+        var permitted = try permittedPositions(for: piece)
+        if piece is Pawn {
+            debugPrint()
+            print("TESTINGDEBUG: permittedPositions for piece: \(piece.description) \(permitted)")
+        }
+        for position in permitted {
+            if let searchPiece = self.piece(at: position),
+               searchPiece.team == piece.team.enemy {
+                attackPositions.append(position)
+            }
+        }
+        return attackPositions
     }
 
     func permittedPositions(for piece: Piece) throws -> [Position] {
@@ -146,6 +167,10 @@ struct Board {
             """
         
         return try! Board.board(from: setupString)
+    }
+    
+    func debugPrint() {
+        print(toString())
     }
     
     func toString() -> String {
