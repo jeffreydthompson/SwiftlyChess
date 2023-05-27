@@ -1,3 +1,3 @@
 # SwiftlyChess
 
-A description of this package.
+A simple Chess game engine framework.
