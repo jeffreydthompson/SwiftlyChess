@@ -7,21 +7,21 @@
 
 import Foundation
 
-struct King: Piece {
+public struct King: Piece {
     
-    var isInInitialPosition: Bool
+    public var isInInitialPosition: Bool
 
-    var rules: [MovementRule] {
+    public var rules: [MovementRule] {
         [.diagonal(range: 1), .straight(range: 1), .castleable]
     }
     
-    var team: Team
-    var position: Position { didSet { isInInitialPosition = false } }
-    var description: String { team == .faceYPositive ? "♚" : "♔"}
+    public var team: Team
+    public var position: Position { didSet { isInInitialPosition = false } }
+    public var description: String { team == .faceYPositive ? "♚" : "♔"}
     
-    var pieceValue: Int? { nil } // invaluable
+    public var pieceValue: Int? { nil } // invaluable
     
-    init(team: Team, position: Position) {
+    public init(team: Team, position: Position) {
         self.team = team
         self.position = position
         

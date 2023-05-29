@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol Graduateable: Piece {
+public protocol Graduateable: Piece {
     static func graduate(pawn: Pawn) -> Self
 }

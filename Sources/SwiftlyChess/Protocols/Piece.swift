@@ -6,7 +6,7 @@
 
 import Foundation
 
-protocol Piece {
+public protocol Piece {
     var isInInitialPosition: Bool { get set }
     var description: String { get }
     var rules: [MovementRule] { get }
@@ -19,14 +19,13 @@ protocol Piece {
 
 extension Piece {
     
-    func positionsInRange() -> [Position] {
+    public func positionsInRange() -> [Position] {
         rules.reduce([Position]()) { ps, rule in
             ps + rule.positionsInRange(of: position, team: team)
         }.removeDoubles()
     }
 
-    //FIXME: - cyclic dependency
-    func moveIsLegal(to space: Position, on board: Board) throws -> Bool {
+    public func moveIsLegal(to space: Position, on board: Board) throws -> Bool {
         if space == position { return false }
         if outOfBounds(space: space, on: board) { return false }
         if isSameTeam(on: space, on: board) { return false }
@@ -37,15 +36,13 @@ extension Piece {
         return true
     }
 
-    //FIXME: - cyclic dependency
-    func outOfBounds(space: Position, on board: Board) -> Bool {
+    public func outOfBounds(space: Position, on board: Board) -> Bool {
         if space.x < 0 || space.y < 0 { return true }
         if space.x >= board.xAxis || space.y >= board.yAxis { return true }
         return false
     }
 
-    //FIXME: - cyclic dependency
-    func isSameTeam(on space: Position, on board: Board) -> Bool {
+    public func isSameTeam(on space: Position, on board: Board) -> Bool {
         if let pieceTeam = board.piece(at: space)?.team,
            pieceTeam == team { return true }
         return false

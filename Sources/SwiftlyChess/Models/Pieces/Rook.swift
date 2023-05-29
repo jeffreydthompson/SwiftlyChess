@@ -7,25 +7,25 @@
 
 import Foundation
 
-struct Rook: Piece {
+public struct Rook: Piece {
     
-    var isInInitialPosition: Bool
+    public var isInInitialPosition: Bool
 
-    var rules: [MovementRule] {
+    public var rules: [MovementRule] {
         [.straight(range: nil), .castleable]
     }
 
-    var team: Team
-    var position: Position {
+    public var team: Team
+    public var position: Position {
         didSet {
             isInInitialPosition = false
         }
     }
-    var description: String { team == .faceYPositive ? "♜" : "♖" }
+    public var description: String { team == .faceYPositive ? "♜" : "♖" }
     
-    var pieceValue: Int? { 5 }
+    public var pieceValue: Int? { 5 }
     
-    init(team: Team, position: Position) {
+    public init(team: Team, position: Position) {
         self.team = team
         self.position = position
         
@@ -39,7 +39,7 @@ struct Rook: Piece {
 }
 
 extension Rook: Graduateable {
-    static func graduate(pawn: Pawn) -> Rook {
+    public static func graduate(pawn: Pawn) -> Rook {
         Rook(team: pawn.team, position: pawn.position)
     }
 }

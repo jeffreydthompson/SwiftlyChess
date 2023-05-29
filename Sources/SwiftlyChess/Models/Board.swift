@@ -6,7 +6,7 @@
 
 import Foundation
 
-struct Board {
+public struct Board {
     
     enum Error: Swift.Error {
         case sameTeamPieceExistsAtThisPosition
@@ -190,7 +190,7 @@ struct Board {
 
 extension Board: Equatable {
     
-    static func == (lhs: Board, rhs: Board) -> Bool {
+    public static func == (lhs: Board, rhs: Board) -> Bool {
         lhs.toString() == rhs.toString()
     }
     

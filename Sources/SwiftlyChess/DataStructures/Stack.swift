@@ -6,7 +6,7 @@
 
 import Foundation
 
-struct Stack<Element> {
+public struct Stack<Element> {
     
     private var collection = [Element]()
     var count: Int { collection.count }

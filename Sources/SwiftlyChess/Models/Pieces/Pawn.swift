@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct Pawn: Piece {
+public struct Pawn: Piece {
     
-    var isInInitialPosition: Bool {
+    public var isInInitialPosition: Bool {
         set { }
         get {
             if (team == .faceYPositive) && (position.y == 1) { return true }
@@ -18,21 +18,21 @@ struct Pawn: Piece {
         }
     }
     
-    var rules: [MovementRule] {
+    public var rules: [MovementRule] {
         [.pawn]
     }
     
-    var team: Team
-    var position: Position
-    var description: String { team == .faceYPositive ? "♟" : "♙" }
+    public var team: Team
+    public var position: Position
+    public var description: String { team == .faceYPositive ? "♟" : "♙" }
     
-    var pieceValue: Int? { 1 }
+    public var pieceValue: Int? { 1 }
     
-    var isGraduationPosition: Bool {
+    public var isGraduationPosition: Bool {
         position.y == 0 || position.y == 7
     }
   
-    func graduate<T: Graduateable>(to piece: T.Type) -> T {
+    public func graduate<T: Graduateable>(to piece: T.Type) -> T {
         T.graduate(pawn: self)
     }
 }

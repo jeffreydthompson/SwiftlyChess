@@ -7,19 +7,19 @@
 
 import Foundation
 
-struct Knight: Piece {
+public struct Knight: Piece {
     
-    var isInInitialPosition: Bool
+    public var isInInitialPosition: Bool
 
-    var rules: [MovementRule] {
+    public var rules: [MovementRule] {
         [.knight]
     }
 
-    var team: Team
-    var position: Position { didSet { isInInitialPosition = false } }
-    var description: String { team == .faceYPositive ? "♞" : "♘" }
+    public var team: Team
+    public var position: Position { didSet { isInInitialPosition = false } }
+    public var description: String { team == .faceYPositive ? "♞" : "♘" }
     
-    var pieceValue: Int? { 3 }
+    public var pieceValue: Int? { 3 }
     
     init(team: Team, position: Position) {
         self.team = team
@@ -35,7 +35,7 @@ struct Knight: Piece {
 }
 
 extension Knight: Graduateable {
-    static func graduate(pawn: Pawn) -> Knight {
+    public static func graduate(pawn: Pawn) -> Knight {
         Knight(team: pawn.team, position: pawn.position)
     }
 }

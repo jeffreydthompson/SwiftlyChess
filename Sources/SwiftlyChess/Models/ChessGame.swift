@@ -8,45 +8,45 @@ import Foundation
 import Combine
 
 @available(macOS 10.15, *)
-struct ChessGame {
+public struct ChessGame {
     
     var board = Board.standardSetup()
     private var turn: Team = .faceYPositive
     let playerTeam: Team
     
-    var graduationNotification = PassthroughSubject<Pawn, Never>()
+    public var graduationNotification = PassthroughSubject<Pawn, Never>()
     
-    var gameHistory = Stack<Board>()// consider if (team: Team, board: Board) is needed to track turn at point in time
+    public var gameHistory = Stack<Board>()// consider if (team: Team, board: Board) is needed to track turn at point in time
     
-    init(playerTeam: Team) {
+    public init(playerTeam: Team) {
         self.playerTeam = playerTeam
     }
     
-    func isDraw() -> Bool {
+    public func isDraw() -> Bool {
         gameHistory.isDraw
     }
     
-    func isStalemate(for team: Team) -> Bool {
+    public func isStalemate(for team: Team) -> Bool {
         board.isStalemate(for: team)
     }
     
-    func isCheck(for team: Team) throws -> Bool {
+    public func isCheck(for team: Team) throws -> Bool {
         try board.isCheck(for: team)
     }
     
-    func isCheckmate(for team: Team) throws -> Bool {
+    public func isCheckmate(for team: Team) throws -> Bool {
         try board.isCheckmate(for: team)
     }
     
-    func select(at position: Position) -> Piece? {
+    public func select(at position: Position) -> Piece? {
         board.piece(at: position)
     }
     
-    mutating func switchTurn() {
+    mutating public func switchTurn() {
         turn = (turn == .faceYPositive) ? .faceYNegative : .faceYPositive
     }
     
-    mutating func move(
+    mutating public func move(
         _ selection: Piece,
         to position: Position) throws {
             try board.movePiece(at: selection.position, to: position)
@@ -57,7 +57,7 @@ struct ChessGame {
             }
         }
     
-    mutating func graduate<T: Graduateable>(
+    mutating public func graduate<T: Graduateable>(
         _ pawn: Pawn,
         to piece: T.Type) throws {
             let upgradedPiece = T.graduate(pawn: pawn)
@@ -65,7 +65,7 @@ struct ChessGame {
             try board.insert(piece: upgradedPiece)
         }
     
-    // TODO: should be private
+    //MARK: - Internal types for AI play
     func shallowSearchBestAttack(for team: Team) -> (from: Position, to: Position)? {
         
         let teamPieces = board.teamPieces(for: team)

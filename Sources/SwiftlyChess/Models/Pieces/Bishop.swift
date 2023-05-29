@@ -7,21 +7,21 @@
 
 import Foundation
 
-struct Bishop: Piece {
+public struct Bishop: Piece {
 
-    var isInInitialPosition: Bool
+    public var isInInitialPosition: Bool
 
-    var rules: [MovementRule] {
+    public var rules: [MovementRule] {
         [.diagonal(range: nil)]
     }
 
-    var team: Team
-    var position: Position { didSet { isInInitialPosition = false } }
-    var description: String { team == .faceYPositive ? "♝" : "♗" }
+    public var team: Team
+    public var position: Position { didSet { isInInitialPosition = false } }
+    public var description: String { team == .faceYPositive ? "♝" : "♗" }
     
-    var pieceValue: Int? { 3 }
+    public var pieceValue: Int? { 3 }
     
-    init(team: Team, position: Position) {
+    public init(team: Team, position: Position) {
         self.team = team
         self.position = position
         
@@ -35,7 +35,7 @@ struct Bishop: Piece {
 }
 
 extension Bishop: Graduateable {
-    static func graduate(pawn: Pawn) -> Bishop {
+    public static func graduate(pawn: Pawn) -> Bishop {
         Bishop(team: pawn.team, position: pawn.position)
     }
 }

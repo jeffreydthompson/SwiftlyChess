@@ -6,7 +6,7 @@
 
 import Foundation
 
-enum Team {
+public enum Team {
     case faceYPositive, faceYNegative
     
     var enemy: Team {
