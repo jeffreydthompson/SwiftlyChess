@@ -20,7 +20,7 @@ extension Array where Element: Hashable {
             elements[element, default: 0] += 1
         }
         
-        var intersection = elements.compactMap({
+        let intersection = elements.compactMap({
             $0.value > 1 ? $0.key : nil
         })
         
@@ -31,7 +31,7 @@ extension Array where Element: Hashable {
 extension Array where Element == Position {
     
     func removeDoubles() -> [Position] {
-        var set = Set(self)
+        let set = Set(self)
         let removed = Array(set)
         return removed
     }

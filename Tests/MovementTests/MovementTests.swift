@@ -287,7 +287,7 @@ final class MovementTests: XCTestCase {
     
     func testQueenMovement() throws {
         sut = try Board.board(from: testQueen)
-        let wQueenStuck = sut.piece(at: Position(x: 3, y: 0))!
+        var wQueenStuck = sut.piece(at: Position(x: 3, y: 0))!
         let bQueenStuck = sut.piece(at: Position(x: 3, y: 7))!
 
         var positions = try sut.permittedPositions(for: wQueenStuck)
@@ -304,6 +304,10 @@ final class MovementTests: XCTestCase {
         positions = try sut.permittedPositions(for: bQueen)
         XCTAssertEqual(positions.count, 9)
         
+        sut = try .board(from: standardSetup)
+        wQueenStuck = sut.piece(at: Position(x: 3, y: 0))!
+        positions = try sut.permittedPositions(for: wQueenStuck)
+        XCTAssertEqual(positions.count, 0)
     }
     
     func testKingIsolated() throws {

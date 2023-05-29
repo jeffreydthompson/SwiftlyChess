@@ -36,7 +36,6 @@ struct Board {
         pieces.filter { $0.team == team }
     }
     
-    // FIXME: - argument name/type
     func castlingSet(for team: Team, rookXisLessThanKingX: Bool) -> (king: King, rook: Rook)? {
         
         let rookX = rookXisLessThanKingX ? 0 : 7
@@ -69,11 +68,7 @@ struct Board {
     func attackPositions(for piece: Piece) throws -> [Position] {
         
         var attackPositions = [Position]()
-        var permitted = try permittedPositions(for: piece)
-        if piece is Pawn {
-            debugPrint()
-            print("TESTINGDEBUG: permittedPositions for piece: \(piece.description) \(permitted)")
-        }
+        let permitted = try permittedPositions(for: piece)
         for position in permitted {
             if let searchPiece = self.piece(at: position),
                searchPiece.team == piece.team.enemy {
@@ -112,26 +107,29 @@ struct Board {
      returns score
      */
     @discardableResult
-    mutating func movePiece(at position: Position, to: Position) throws -> Int {
-        guard var movePiece = piece(at: position) else {
-            throw Error.noPieceExistsAtThisPosition
-        }
-        
-        var points = 0
-        if let occupyingPiece = piece(at: to) {
-            if occupyingPiece.team != movePiece.team {
-                points = occupyingPiece.pieceValue ?? 1000
-                try self.remove(at: to)
-            } else {
-                throw Error.sameTeamPieceExistsAtThisPosition
+    mutating func movePiece(
+        at position: Position,
+        to: Position) throws -> Int {
+            
+            guard var movePiece = piece(at: position) else {
+                throw Error.noPieceExistsAtThisPosition
             }
+            
+            var points = 0
+            if let occupyingPiece = piece(at: to) {
+                if occupyingPiece.team != movePiece.team {
+                    points = occupyingPiece.pieceValue ?? 1000 // king value nil - artificially high number.
+                    try self.remove(at: to)
+                } else {
+                    throw Error.sameTeamPieceExistsAtThisPosition
+                }
+            }
+            
+            movePiece.position = to
+            try remove(at: position)
+            try insert(piece: movePiece)
+            return points
         }
-        
-        movePiece.position = to
-        try remove(at: position)
-        try insert(piece: movePiece)
-        return points
-    }
     
     static func board(from string: String) throws -> Board {
         let ary = string.multiLineCharArray

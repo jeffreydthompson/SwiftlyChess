@@ -39,31 +39,36 @@ struct ChessGame {
     }
     
     func select(at position: Position) -> Piece? {
-        fatalError("Unimplemented")
+        board.piece(at: position)
     }
     
     mutating func switchTurn() {
         turn = (turn == .faceYPositive) ? .faceYNegative : .faceYPositive
     }
     
-    mutating func move(_ selection: Piece, to position: Position) throws {
-        try board.movePiece(at: selection.position, to: position)
-        if selection is Pawn {
-            if selection.position.y == 0 || selection.position.y == 7 {
-                graduationNotification.send(selection as! Pawn)
+    mutating func move(
+        _ selection: Piece,
+        to position: Position) throws {
+            try board.movePiece(at: selection.position, to: position)
+            if selection is Pawn {
+                if selection.position.y == 0 || selection.position.y == 7 {
+                    graduationNotification.send(selection as! Pawn)
+                }
             }
         }
-    }
     
-    mutating func graduate<T: Graduateable>(_ pawn: Pawn, to piece: T.Type) throws {
-        let upgradedPiece = T.graduate(pawn: pawn)
-        try board.remove(at: pawn.position)
-        try board.insert(piece: upgradedPiece)
-    }
+    mutating func graduate<T: Graduateable>(
+        _ pawn: Pawn,
+        to piece: T.Type) throws {
+            let upgradedPiece = T.graduate(pawn: pawn)
+            try board.remove(at: pawn.position)
+            try board.insert(piece: upgradedPiece)
+        }
     
+    // TODO: should be private
     func shallowSearchBestAttack(for team: Team) -> (from: Position, to: Position)? {
         
-        let teamPieces = board.pieces.filter({ $0.team == team })
+        let teamPieces = board.teamPieces(for: team)
         
         var highScoreFrom: Position?
         var highScoreTo: Position?
@@ -72,7 +77,6 @@ struct ChessGame {
         for piece in teamPieces {
             guard let positions = try? board.attackPositions(for: piece) else { continue }
             for position in positions {
-                print("TESTINGDEBUG piece: \(piece.description) is trying from position: \(piece.position) to: \(position)")
                 var editBoard = board
                 
                 guard let score = try? editBoard.movePiece(at: piece.position, to: position) else { continue }
@@ -86,8 +90,6 @@ struct ChessGame {
                 
                 let counterAttack = findHighestValueAttack(for: team.enemy, on: editBoard)
                 let counterScore = counterAttack?.score ?? 0
-                
-                print("TESTINGDEBUG.  attack score: \(score) counter attack score: \(counterScore)")
                 
                 let calculatedScore = score - counterScore
                 
@@ -111,6 +113,51 @@ struct ChessGame {
         return nil
     }
     
+    func attemptCheck(forAttackingTeam team: Team, altBoard: Board? = nil) -> (from: Position, to: Position)? {
+        
+        let thisBoard = altBoard ?? board
+        let pieces = thisBoard.teamPieces(for: team)
+        var checkPositions = [(Position, Position, Int)]()
+        
+        for piece in pieces {
+            
+            guard let positions = try? board.permittedPositions(for: piece) else { continue }
+            
+            for position in positions {
+                var editBoard = thisBoard
+                guard let _ = try? editBoard.movePiece(at: piece.position, to: position) else { continue }
+                guard let _ = try? !editBoard.isCheck(for: team) else {
+                    continue
+                }
+                guard let check = try? editBoard.isCheck(for: team.enemy) else {
+                    continue
+                }
+                
+                if check {
+                    let counterAttack = findHighestValueAttack(for: turn.enemy, on: editBoard)
+                    let counterScore = counterAttack?.score ?? 0
+                    checkPositions.append((piece.position, position, counterScore))
+                }
+                
+                if let checkmate = try? editBoard.isCheckmate(for: team.enemy),
+                   checkmate {
+                    return (piece.position, position)
+                }
+            }
+        }
+        
+        //make least dangerous
+        if !checkPositions.isEmpty {
+            checkPositions.sort { $0.2 < $1.2 }
+            guard let from = checkPositions.first?.0,
+                  let to = checkPositions.first?.1 else {
+                return nil
+            }
+            return (from, to)
+        }
+        return nil
+    }
+    
     // Shallow calculation moves
     func findHighestValueAttack(
         for team: Team,
@@ -124,10 +171,8 @@ struct ChessGame {
             var highScore = 0
             
             for piece in teamPieces {
-                print("TESTINGDEBUG: counter attack \(piece.description) at \(piece.position)")
                 guard let positions = try? thisBoard.attackPositions(for: piece) else { continue }
                 for position in positions {
-                    print("TESTINGDEBUG: counter attack \(piece.description) at \(piece.position) to \(position)")
                     var editBoard = thisBoard
                     guard let score = try? editBoard.movePiece(at: piece.position, to: position) else { continue }
                     if score > highScore {

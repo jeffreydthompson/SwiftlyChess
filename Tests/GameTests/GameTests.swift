@@ -125,5 +125,30 @@ final class GameTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
+    
+    func testFindCheck() throws {
+        
+        sut.board = try .board(from: checkFindTestSetup)
+        
+        guard let position = sut.attemptCheck(forAttackingTeam: .faceYPositive) else {
+            XCTFail("should be a position")
+            return
+        }
+        
+        XCTAssertEqual(position.from, Position(x: 5, y: 5))
+        XCTAssertEqual(position.to, Position(x: 5, y: 6))
+    }
+    
+    func testFindCheckmate() throws {
+        sut.board = try .board(from: checkFindTestSetupTwo)
+        
+        guard let position = sut.attemptCheck(forAttackingTeam: .faceYPositive) else {
+            XCTFail("should be a position")
+            return
+        }
+        
+        XCTAssertEqual(position.from, Position(x: 1, y: 3))
+        XCTAssertEqual(position.to, Position(x: 5, y: 7))
+    }
 
 }

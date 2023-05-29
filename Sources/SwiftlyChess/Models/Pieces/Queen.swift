@@ -24,6 +24,8 @@ struct Queen: Piece {
     init(team: Team, position: Position) {
         self.team = team
         self.position = position
+        
+        //setup for test cases
         if (position.y == 0 || position.y == 7) && (position.x == 4) {
             self.isInInitialPosition = true
         } else {

@@ -47,30 +47,21 @@ struct CheckmateCalculator {
     }
     
     mutating func canEscapeCheck() throws -> Bool {
-
+        
         let escapePositions = try board.permittedPositions(for: king)
-        var canEscape = [Bool]()
         for position in escapePositions {
-            do {
-                var newBoard = board
-                try newBoard.movePiece(at: king.position, to: position)
-                var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
-                if newCalculator.isCheck() {
-                    canEscape.append(false)
-                } else {
-                    canEscape.append(true)
-                }
-            } catch {
-                print("DEBUG ERROR Board.isCheckmate escape: \(error)")
+            var newBoard = board
+            try newBoard.movePiece(at: king.position, to: position)
+            var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
+            if !newCalculator.isCheck() {
+                return true
             }
         }
-        if canEscape.isEmpty { return false }
-        return canEscape.hasTrue
+        return false
     }
     
     mutating func teamCanBlock() throws -> Bool {
         
-        var potentialBlockPositions = [Bool]()
         var removeKnights = potentialAttackers
         removeKnights.removeAll(where: { $0 is Knight })
         for attacker in removeKnights {
@@ -78,51 +69,38 @@ struct CheckmateCalculator {
             for position in range {
                 for piece in teamPieces {
                     if try piece.moveIsLegal(to: position, on: board) {
-                        do {
-                            var newBoard = board
-                            try newBoard.movePiece(at: piece.position, to: position)
-                            var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
-                            if newCalculator.isCheck() {
-                                potentialBlockPositions.append(false)
-                            } else {
-                                potentialBlockPositions.append(true)
-                            }
-                        } catch {
-                            print("DEBUG ERROR Board.isCheckmate escape: \(error)")
+                        
+                        var newBoard = board
+                        try newBoard.movePiece(at: piece.position, to: position)
+                        var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
+                        if !newCalculator.isCheck() {
+                            return true
                         }
                     }
                 }
             }
         }
-        if potentialBlockPositions.isEmpty { return false }
-        return potentialBlockPositions.hasTrue
+        return false
     }
     
     mutating func canNeutralizeAttackers() throws -> Bool {
-
-        var attackersNeutralized = [Bool]()
+        
         for attacker in potentialAttackers {
             // let's see if we can take them out
             let threatCancellers = try getPotentialAttackers(for: attacker)
             for canceller in threatCancellers {
                 // let's make a hypothetical and see if the king is safe
-                do {
-                    var newBoard = board
-                    try newBoard.remove(at: attacker.position)
-                    try newBoard.movePiece(at: canceller.position, to: attacker.position)
-                    var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
-                    if newCalculator.isCheck() {
-                        attackersNeutralized.append(false)
-                    } else {
-                        attackersNeutralized.append(true)
-                    }
-                } catch {
-                    print("DEBUG ERROR Board.isCheckmate neutralize: \(error)")
+                
+                var newBoard = board
+                try newBoard.remove(at: attacker.position)
+                try newBoard.movePiece(at: canceller.position, to: attacker.position)
+                var newCalculator = try CheckmateCalculator(team: team, board: newBoard)
+                if !newCalculator.isCheck() {
+                    return true
                 }
             }
         }
-        if attackersNeutralized.isEmpty { return false }
-        return !attackersNeutralized.hasFalse
+        return false
     }
     
     private func getPotentialAttackers(for piece: Piece) throws -> [Piece] {
