@@ -9,6 +9,7 @@ import Foundation
 
 extension Stack where Element == Board {
     
+    //FIXME: - this isn't a real definition for 'draw'
     var isDraw: Bool {
         if count < 50 { return false }
         let records = suffix(maxLength: 50)

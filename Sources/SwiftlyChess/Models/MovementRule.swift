@@ -93,6 +93,7 @@ public enum MovementRule {
         return positions
     }
     
+    //FIXME: - cyclic dependency
     func obeysRule(
         from: Position,
         to: Position,
@@ -106,6 +107,7 @@ public enum MovementRule {
             return true
         }
     
+    //FIXME: - cyclic dependency
     private func proposedPathAllSquaresSafeFromCheck(
         from: Position,
         to: Position,
@@ -116,6 +118,7 @@ public enum MovementRule {
                 }
         }
     
+    //FIXME: - cyclic dependency
     private func proposedMoveSafeFromCheck(
         from: Position,
         to: Position,
@@ -132,6 +135,7 @@ public enum MovementRule {
             }
         }
     
+    //FIXME: - cyclic dependency
     /// ignores game rules allowing piece to attack or skip.  simply returns if there are no pieces in the range
     private func isEmpty(
         from: Position,
@@ -143,6 +147,7 @@ public enum MovementRule {
                 .isEmpty
         }
     
+    //FIXME: - cyclic dependency
     private func isFreeOfBlockingPieces(
         from: Position,
         to: Position,
@@ -163,6 +168,7 @@ public enum MovementRule {
             }
         }
 
+    //FIXME: - cyclic dependency
     private func knightCanMove(
         from: Position,
         to: Position,
@@ -176,7 +182,7 @@ public enum MovementRule {
             return true
         }
 
-
+    //FIXME: - cyclic dependency
     private func pawnCanMove(
         from: Position,
         to: Position,
@@ -221,6 +227,7 @@ public enum MovementRule {
             return true
         }
 
+    //FIXME: - cyclic dependency
     private func canMoveStraightDiagonal(
         from: Position,
         to: Position,
@@ -242,6 +249,7 @@ public enum MovementRule {
             return true
         }
 
+    //FIXME: - cyclic dependency
     private func canCastle(
         from: Position,
         to: Position,

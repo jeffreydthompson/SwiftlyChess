@@ -28,12 +28,6 @@ struct Pawn: Piece {
     
     var pieceValue: Int? { 1 }
     
-//    var isInInitialPosition: Bool {
-//        if (team == .faceYPositive) && (position.y == 1) { return true }
-//        if (team == .faceYNegative) && (position.y == 6) { return true }
-//        return false
-//    }
-    
     var isGraduationPosition: Bool {
         position.y == 0 || position.y == 7
     }

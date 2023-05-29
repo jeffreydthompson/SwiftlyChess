@@ -24,6 +24,8 @@ struct Knight: Piece {
     init(team: Team, position: Position) {
         self.team = team
         self.position = position
+        
+        //setup for test cases
         if (position.x == 1 || position.x == 6) && (position.y == 0 || position.y == 7) {
             self.isInInitialPosition = true
         } else {

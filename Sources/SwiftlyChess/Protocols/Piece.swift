@@ -25,6 +25,7 @@ extension Piece {
         }.removeDoubles()
     }
 
+    //FIXME: - cyclic dependency
     func moveIsLegal(to space: Position, on board: Board) throws -> Bool {
         if space == position { return false }
         if outOfBounds(space: space, on: board) { return false }
@@ -36,12 +37,14 @@ extension Piece {
         return true
     }
 
+    //FIXME: - cyclic dependency
     func outOfBounds(space: Position, on board: Board) -> Bool {
         if space.x < 0 || space.y < 0 { return true }
         if space.x >= board.xAxis || space.y >= board.yAxis { return true }
         return false
     }
 
+    //FIXME: - cyclic dependency
     func isSameTeam(on space: Position, on board: Board) -> Bool {
         if let pieceTeam = board.piece(at: space)?.team,
            pieceTeam == team { return true }

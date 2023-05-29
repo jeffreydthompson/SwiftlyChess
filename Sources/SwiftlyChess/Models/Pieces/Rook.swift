@@ -18,7 +18,6 @@ struct Rook: Piece {
     var team: Team
     var position: Position {
         didSet {
-            print("ROOK didSet Position")
             isInInitialPosition = false
         }
     }
@@ -30,6 +29,7 @@ struct Rook: Piece {
         self.team = team
         self.position = position
         
+        //setup for test cases
         if (position.x == 0 || position.x == 7) && (position.y == 0 || position.y == 7) {
             self.isInInitialPosition = true
         } else {
