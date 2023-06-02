@@ -43,7 +43,7 @@ public struct Board {
         
         if let king = king(for: team),
            king.isInInitialPosition,
-           let rook = piece(at: Position(x: rookX, y: rookY)) as? Rook,
+           let rook = piece(at: Position(x: rookX, y: rookY)!) as? Rook,
            rook.isInInitialPosition {
             return (king: king, rook: rook)
         } else {
@@ -142,7 +142,7 @@ public struct Board {
         for yPos in (0..<8) {
             for xPos in (0..<8) {
                 let str = ary[7-yPos][xPos]
-                let position = Position(x: xPos, y: yPos)
+                let position = Position(x: xPos, y: yPos)!
                 if let piece = PieceMaker.piece(from: str, at: position) {
                     try board.insert(piece: piece)
                 }
@@ -180,7 +180,7 @@ public struct Board {
             let invertedY = 7-yPos
 
             return (0..<8).map { xPos in
-                piece(at: Position(x: xPos, y: invertedY))?.description ?? " "
+                piece(at: Position(x: xPos, y: invertedY)!)?.description ?? " "
             }.joined()
         }
         return strings

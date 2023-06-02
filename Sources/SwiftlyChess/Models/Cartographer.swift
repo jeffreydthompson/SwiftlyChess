@@ -67,7 +67,7 @@ struct Cartographer {
         }
         // assemble positions
         return Array(zip(xRange, yRange))
-            .map { Position(x: $0.0, y: $0.1) }
+            .map { Position(x: $0.0, y: $0.1)! }
     }
     
     func compass(from: Position, to: Position) -> Compass? {

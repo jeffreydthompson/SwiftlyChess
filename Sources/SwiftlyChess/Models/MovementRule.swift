@@ -85,7 +85,7 @@ public enum MovementRule {
             //return all X Row positions for a Y given position
             (0..<8).forEach { index in
                 if index != position.x {
-                    positions.append(Position(x: index, y: position.y))
+                    positions.append(Position(x: index, y: position.y)!)
                 }
             }
         }
@@ -93,7 +93,6 @@ public enum MovementRule {
         return positions
     }
     
-    //FIXME: - cyclic dependency
     func obeysRule(
         from: Position,
         to: Position,
@@ -107,7 +106,6 @@ public enum MovementRule {
             return true
         }
     
-    //FIXME: - cyclic dependency
     private func proposedPathAllSquaresSafeFromCheck(
         from: Position,
         to: Position,
@@ -118,7 +116,6 @@ public enum MovementRule {
                 }
         }
     
-    //FIXME: - cyclic dependency
     private func proposedMoveSafeFromCheck(
         from: Position,
         to: Position,
@@ -135,7 +132,6 @@ public enum MovementRule {
             }
         }
     
-    //FIXME: - cyclic dependency
     /// ignores game rules allowing piece to attack or skip.  simply returns if there are no pieces in the range
     private func isEmpty(
         from: Position,
@@ -147,7 +143,6 @@ public enum MovementRule {
                 .isEmpty
         }
     
-    //FIXME: - cyclic dependency
     private func isFreeOfBlockingPieces(
         from: Position,
         to: Position,
@@ -168,7 +163,6 @@ public enum MovementRule {
             }
         }
 
-    //FIXME: - cyclic dependency
     private func knightCanMove(
         from: Position,
         to: Position,
@@ -182,7 +176,6 @@ public enum MovementRule {
             return true
         }
 
-    //FIXME: - cyclic dependency
     private func pawnCanMove(
         from: Position,
         to: Position,
@@ -227,7 +220,6 @@ public enum MovementRule {
             return true
         }
 
-    //FIXME: - cyclic dependency
     private func canMoveStraightDiagonal(
         from: Position,
         to: Position,
@@ -249,7 +241,6 @@ public enum MovementRule {
             return true
         }
 
-    //FIXME: - cyclic dependency
     private func canCastle(
         from: Position,
         to: Position,
@@ -301,7 +292,7 @@ public enum MovementRule {
             // Casting Rule 4. The squares the king will pass over may not be under attack, nor can the square on which the king will land.
             guard try proposedPathAllSquaresSafeFromCheck(
                 from: king.position,
-                to: Position(x: kingToX, y: to.y),
+                to: Position(x: kingToX, y: to.y)!,
                 board: board) else { return false }
 
             return true

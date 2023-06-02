@@ -85,4 +85,23 @@ final class BoardTests: XCTestCase {
         XCTAssertTrue(StalemateCalculator.isStalemate(on: sut, for: .faceYNegative))
         XCTAssertFalse(StalemateCalculator.isStalemate(on: sut, for: .faceYPositive))
     }
+    
+    func testCoordinateCreation() {
+        
+        let coordinateOne = Coordinate("a1")
+        XCTAssertNotNil(coordinateOne)
+        XCTAssertEqual(coordinateOne, Coordinate(col: .colA, row: .row1))
+        XCTAssertEqual(coordinateOne, Coordinate(col: 1, row: 1))
+        
+        let coordinateTwo = Coordinate("h8")
+        XCTAssertNotNil(coordinateTwo)
+        XCTAssertEqual(coordinateTwo, Coordinate(col: .colH, row: .row8))
+        XCTAssertEqual(coordinateTwo, Position(x: 7, y: 7)!.coordinate)
+        
+        let coordinateThree = Coordinate("this coordinate should be nil")
+        XCTAssertNil(coordinateThree)
+        
+        let coordinateFour = Coordinate("B0")
+        XCTAssertNil(coordinateFour)
+    }
 }

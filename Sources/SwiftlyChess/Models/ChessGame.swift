@@ -234,7 +234,7 @@ public struct ChessGame {
             yAxis.shuffle()
             for x in xAxis {
                 for y in yAxis {
-                    let position = Position(x: x, y: y)
+                    let position = Position(x: x, y: y)!
                     if try player.moveIsLegal(to: position, on: board) {
                         do {
                             try? board.remove(at: position)
